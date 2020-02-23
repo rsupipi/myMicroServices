@@ -12,7 +12,7 @@ public class Message {
     }
 
     /** getter should be define, for automatic conversion**/
-//    public String getMyMessage() {
-//        return myMessage;
-//    }
+    public String getMyMessage() {
+        return myMessage;
+    }
 }

@@ -23,8 +23,51 @@ public class HelloWordController {
     }
 }
 ```
-
-***output:***
 URL: http://localhost:8080/hello
 
-hello pipi
+***output:***
+```json
+hi pipi
+```
+
+## Returen bean
+
+```java
+    @GetMapping("hello-bean")
+    public Message helloBean(){
+        return new Message("hi pipi");
+    }
+```
+
+* getters and setters should be define of the bean.
+
+URL: http://localhost:8080/hello-bean
+
+***output:***
+```json
+{
+    "myMessage": "hi pipi"
+}
+```
+
+
+## Add path variables
+
+```java
+    @GetMapping("hello/user/{name}")
+    public Message helloPathVariable(@PathVariable String name){
+        return new Message(String.format("Hello %s", name));
+    }
+```
+
+* getters and setters should be define of the bean.
+
+URL: http://localhost:8080/hello-bean
+
+***output:***
+```json
+{
+    "myMessage": "Hello RuchiraSupipi"
+}
+```
+
