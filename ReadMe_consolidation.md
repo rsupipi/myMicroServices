@@ -1,3 +1,17 @@
+
+
+# 5. Spring Cloud config server
+`03_Spring_config_server.png`
+
+Here we establish the connection with the springCloudServer and the git repository.
+
+* it store multiple configurations, in different services.
+[currencyCalculationService, CurrencyExchangeService, LimitServce]
+
+* it can store configuration in different environments
+[LimitService-> dev, QA, stage, Production]
+
+
 # 4. Get configuration from application properties
 
 ***1. application.properties***
@@ -174,6 +188,3 @@ http://localhost:8080/limits
 	* Faster Release cycle
 
 ## [Standard Ports and  URLs:](https://github.com/in28minutes/spring-microservices/tree/master/03.microservices)
-
-## Spring Cloud config server
-`03_Spring_config_server.png`

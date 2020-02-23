@@ -1,62 +1,26 @@
-# Get configuration from application properties
+# Spring Cloud config Server
 
-***1. application.properties***
+## Setting up spring cloud config server
 
-add application name
-```properties
-spring.application.name=pipi-service
+1. go to https://start.spring.io/
+2. create project call `spring-cloud-config-server`. 
+`07_SpringConfigServer.PNG`
+`07_SpringConfigServer_dependancy.PNG`
+3. dependancy -> Dev tool, config Server
 
-limit-service.minimum=99
-limit-service.maximum=9999
-```
-***2. Configuration.java***
+* For managing purpose I have added this server to root in this project.
 
-get configuration from `application.properties`
-```java
-@Component /** @ConfigurationProperties is sufficient to register bean as a component**/
-@ConfigurationProperties("limit-service")
-@Getter @Setter  /** should be generate getters and setters**/
-public class Configuration {
-    private int maximum;
-    private int minimum;
+## Ports
 
-}
+|     Application       |     Port          |
+| ------------- | ------------- |
+| Limits Service | 8080, 8081, ... |
+| Spring Cloud Config Server | 8888 |
+|  |  |
+| Currency Exchange Service | 8000, 8001, 8002, ..  |
+| Currency Conversion Service | 8100, 8101, 8102, ... |
+| Netflix Eureka Naming Server | 8761 |
+| Netflix Zuul API Gateway Server | 8765 |
+| Zipkin Distributed Tracing Server | 9411 |
 
-```
-***3. LimitsConfigurationContorller.java***
-
-create a controller class
-```java
-@RestController
-public class LimitsConfigurationContorller {
-
-    @Autowired
-    private Configuration configuration;
-
-    @GetMapping("/limits")
-    public LimitConfiguration retriveLimitsFromConfigurations(){
-        return new LimitConfiguration(configuration.getMaximum(), configuration.getMinimum());
-    }
-
-}
-```
-
-***3. Run the project***
-
-* run it via the IDE
-Run configuration -> + SpringBoot -> add `MyMicroServicesApplication` -> ok -> click run
-
-* using maven
-`mvn clean install`
-`mvn spring-boot:run`
-
-***URL***
-http://localhost:8080/limits
-
-***output***
-```json
-{
-    "maximum": 9999,
-    "minimum": 99
-}
-```
+***application.properties***
