@@ -129,6 +129,10 @@ http://localhost:8080/limits
 
 # 1. Web Services
 
+## SAOP vs REST
+
+	* Restriction vs Architectural style
+
 ## 1. SOAP:
 
 	1. Use XML for request and response
@@ -154,10 +158,40 @@ http://localhost:8080/limits
 	4. data exchange format -> XML, HTML, JSON
 	5. transport  -> only HTTP [rest is build on top of HTTP]
 	6. Service definition -> no standard. (WADL, swagger..)
+	7. REST is a style of software architecture for distributed hypermedia system
 
-## SAOP vs REST
+Representation state transfer: `08_RESTful_webService.PNG`
 
-	* Restriction vs Architectural style
+## Annotations
+
+```java
+@RequestMapping(method = RequestMethod.GET, path = "hello")
+
+@GetMapping("hello")
+@PostMapping("user")
+@DeleteMapping("user/{id}")
+@PutMapping("user/{id}")
+``` 
+
+### REST project
+
+***1. HelloWordController.java controller***
+```java
+@RestController
+public class HelloWordController {
+
+    //@RequestMapping(method = RequestMethod.GET, path = "hello")
+    @GetMapping("hello")    /** This is short and sweet**/
+    public String helloWorld(){
+        return "hello pipi";
+    }
+}
+```
+
+***output:***
+URL: http://localhost:8080/hello
+
+hello pipi
 
 # Microservices
 	1.  REST
@@ -188,3 +222,6 @@ http://localhost:8080/limits
 	* Faster Release cycle
 
 ## [Standard Ports and  URLs:](https://github.com/in28minutes/spring-microservices/tree/master/03.microservices)
+
+# Note:
+Install JSON viewer chrome plugin for formatted JSON.
