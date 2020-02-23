@@ -1,22 +1,41 @@
-# Creating a hardcoded service
+# Get configuration from application properties
 
 ***1. application.properties***
 
 add application name
 ```properties
-spring.application.name=limits-service
-```
+spring.application.name=pipi-service
 
-***2. LimitsConfigurationContorller.java***
+limit-service.minimum=99
+limit-service.maximum=9999
+```
+***2. Configuration.java***
+
+get configuration from `application.properties`
+```java
+@Component /** @ConfigurationProperties is sufficient to register bean as a component**/
+@ConfigurationProperties("limit-service")
+@Getter @Setter  /** should be generate getters and setters**/
+public class Configuration {
+    private int maximum;
+    private int minimum;
+
+}
+
+```
+***3. LimitsConfigurationContorller.java***
 
 create a controller class
 ```java
 @RestController
 public class LimitsConfigurationContorller {
 
+    @Autowired
+    private Configuration configuration;
+
     @GetMapping("/limits")
     public LimitConfiguration retriveLimitsFromConfigurations(){
-        return new LimitConfiguration(100, 1);
+        return new LimitConfiguration(configuration.getMaximum(), configuration.getMinimum());
     }
 
 }
@@ -37,7 +56,7 @@ http://localhost:8080/limits
 ***output***
 ```json
 {
-    "maximum": 100,
-    "minimum": 1
+    "maximum": 9999,
+    "minimum": 99
 }
 ```

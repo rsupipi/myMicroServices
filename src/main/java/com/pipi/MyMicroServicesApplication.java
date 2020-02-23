@@ -1,4 +1,4 @@
-package com.pipi.myMicroServices;
+package com.pipi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
