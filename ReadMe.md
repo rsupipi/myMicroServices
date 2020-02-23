@@ -71,3 +71,4 @@ URL: http://localhost:8080/hello-bean
 }
 ```
 
+https://www.learningcrux.com/video/master-microservices-with-spring-boot-and-spring-cloud/2/8
