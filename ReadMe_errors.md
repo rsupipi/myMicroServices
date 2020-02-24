@@ -38,3 +38,7 @@ public class Message {
     }
 ```
   
+# Type definition error
+"status = 5000"
+"Internal server error"
+* With the latest Jackson and SB. version default constructor is no longer needed.

@@ -1,74 +1,134 @@
-## Annotations
+## Bean and Services
 
-```java
-@RequestMapping(method = RequestMethod.GET, path = "hello")
-
-@GetMapping("hello")
-@PostMapping("user")
-@DeleteMapping("user/{id}")
-@PutMapping("user/{id}")
-``` 
-
-## REST project
-
-***1. HelloWordController.java controller***
 ```java
 @RestController
-public class HelloWordController {
+public class UserController {
 
-    //@RequestMapping(method = RequestMethod.GET, path = "hello")
-    @GetMapping("hello")    /** This is short and sweet**/
-    public String helloWorld(){
-        return "hello pipi";
+    @Autowired
+    private UserDaoService userService;
+
+    // get all ==================================================
+    @GetMapping("/users")
+    public List<User> retrieveAllUsers() {
+        return userService.findAll();
     }
+
+    // get by ID ==================================================
+    @GetMapping("/users1/{id}")
+    public User retrieveUser1(@PathVariable int id) {
+        return userService.findOne(id);
+    }
+
+    @GetMapping("/users2/{id}")
+    public User retrieveUser2(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        return user;
+    }
+
+    // save  ==================================================
+    @PostMapping("/users1")
+    public User createUser1(@RequestBody User user) {
+        return userService.save(user);
+    }
+
+    /**
+     * returning status code and Location URI
+     **/
+    @PostMapping("/users2")
+    public ResponseEntity<Object> createUser2(@RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    // delete ==================================================
+
+
 }
 ```
-URL: http://localhost:8080/hello
 
-***output:***
-```json
-hi pipi
-```
+URL: GET -> http://localhost:8080/users/2
 
-## Returen bean
-
-```java
-    @GetMapping("hello-bean")
-    public Message helloBean(){
-        return new Message("hi pipi");
-    }
-```
-
-* getters and setters should be define of the bean.
-
-URL: http://localhost:8080/hello-bean
-
-***output:***
+Response:
 ```json
 {
-    "myMessage": "hi pipi"
+    "id": 2,
+    "name": "mala",
+    "birthDate": "2020-02-24T05:17:50.850+0000"
 }
 ```
 
+URL: GET -> http://localhost:8080/users
 
-## Add path variables
-
-```java
-    @GetMapping("hello/user/{name}")
-    public Message helloPathVariable(@PathVariable String name){
-        return new Message(String.format("Hello %s", name));
+Response:
+```json
+[
+    {
+        "id": 1,
+        "name": "sama",
+        "birthDate": "2020-02-24T05:17:50.850+0000"
+    },
+    {
+        "id": 2,
+        "name": "mala",
+        "birthDate": "2020-02-24T05:17:50.850+0000"
+    },
+    {
+        "id": 3,
+        "name": "amara",
+        "birthDate": "2020-02-24T05:17:50.850+0000"
     }
+]
 ```
 
-* getters and setters should be define of the bean.
-
-URL: http://localhost:8080/hello-bean
-
-***output:***
+URL: POST -> http://localhost:8080/users
+Request:
 ```json
 {
-    "myMessage": "Hello RuchiraSupipi"
+    "id": 0,
+    "name": "kamala",
+    "birthDate": "2000-02-24T05:17:50.850+0000"
+}
+```
+09_PostCreateNewUser.PNG
+
+Response:
+```json
+{
+    "id": 4,
+    "name": "kamala",
+    "birthDate": "2000-02-24T05:17:50.850+0000"
 }
 ```
 
-https://www.learningcrux.com/video/master-microservices-with-spring-boot-and-spring-cloud/2/8
+* with status code:
+10_PostCreateNewUser_statusCode.PNG
+
+# Exception Handling
+
+***Exception***
+```java
+/** Returning the Status code */
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+
+***Controller***
+```java
+    @GetMapping("/users2/{id}")
+    public User retrieveUser2(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        return user;
+    }
+```
