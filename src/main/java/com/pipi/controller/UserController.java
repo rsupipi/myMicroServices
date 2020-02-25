@@ -1,10 +1,11 @@
 package com.pipi.controller;
 
 import com.pipi.bean.User;
-import com.pipi.bean.UserDaoService;
+import com.pipi.service.UserDaoService;
 import com.pipi.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,13 @@ public class UserController {
     }
 
     // delete ==================================================
+    @DeleteMapping("/users/{id}")
+    public User deleteUser(@PathVariable int id) {
+        User user = userService.deleteById(id);
 
-
+        if (user == null){
+            throw new UserNotFoundException("id - " + id);
+        }
+        return user;
+    }
 }

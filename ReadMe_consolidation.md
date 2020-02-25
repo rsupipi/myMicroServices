@@ -167,8 +167,15 @@ public class UserController {
     }
 
     // delete ==================================================
+    @DeleteMapping("/users/{id}")
+    public User deleteUser(@PathVariable int id) {
+        User user = userService.deleteById(id);
 
-
+        if (user == null){
+            throw new UserNotFoundException("id - " + id);
+        }
+        return user;
+    }
 }
 ```
 
@@ -231,6 +238,8 @@ Response:
 
 # Exception Handling
 
+## create custom class for handling 
+
 ***Exception***
 ```java
 /** Returning the Status code */
@@ -252,6 +261,33 @@ public class UserNotFoundException extends RuntimeException {
         }
         return user;
     }
+```
+
+`11_content_notFound.PNG`
+
+## Implementing Generic Exception Handling For All Resources
+
+```java
+@ControllerAdvice /* to be applicable across all controller */
+@RestController /** this is a kind of controller */
+public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+// handle all exception
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+// handle notFound exception
+    @ExceptionHandler(UserNotFoundException.class)
+    public final ResponseEntity<Object> handleNotFoundException(UserNotFoundException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+}
 ```
 
 # 2. Creating Spring Boot application
