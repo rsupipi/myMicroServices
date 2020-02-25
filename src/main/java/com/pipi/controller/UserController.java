@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -54,6 +55,17 @@ public class UserController {
      **/
     @PostMapping("/users2")
     public ResponseEntity<Object> createUser2(@RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    /**
+     * Add validation
+     **/
+    @PostMapping("/users3")
+    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
         User savedUser = userService.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedUser.getId()).toUri();

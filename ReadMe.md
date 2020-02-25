@@ -1,53 +1,69 @@
-# Exception Handling
+# Validation
 
-## create custom class for handling 
-
-***Exception***
+***UserController.java***
 ```java
-/** Returning the Status code */
-@ResponseStatus(HttpStatus.NO_CONTENT)
-public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
+    @PostMapping("/users3")
+    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
+```
+
+***User.java***
+```java
+public class User {
+    private int id;
+
+    @Size(min = 2) // validate the size for 2 letters
+    private String name;
+
+    @Past // validate this should be a past date
+    private Date birthDate;
 }
 ```
 
-***Controller***
+***output :***
+12_validation.PNG
+status: 400 Bad request
+
+## custom validation
+
+***CustomizedResponseEntityExceptionHandler.java***
 ```java
-    @GetMapping("/users2/{id}")
-    public User retrieveUser2(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
-            throw new UserNotFoundException("id - " + id);
-        }
-        return user;
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+//                ex.getBindingResult().toString());
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Validation Faild",
+                ex.getBindingResult().toString());
+
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 ```
 
-`11_content_notFound.PNG`
-
-## Implementing Generic Exception Handling For All Resources
+******
+```java
+    @PostMapping("/users3")
+    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+```
 
 ```java
-@ControllerAdvice /* to be applicable across all controller */
-@RestController /** this is a kind of controller */
-public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class User {
+    private int id;
 
-// handle all exception
-    @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    @Size(min = 2 , message = "Name should have at least 2 char") // validate the size for 2 letters
+    private String name;
 
-// handle notFound exception
-    @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<Object> handleNotFoundException(UserNotFoundException ex, WebRequest request){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
-    }
+    @Past // validate this should be a past date
+    private Date birthDate;
 }
 ```
