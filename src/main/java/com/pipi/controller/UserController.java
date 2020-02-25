@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.Resource;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -35,6 +37,7 @@ public class UserController {
         return userService.findOne(id);
     }
 
+    /** With exception handling*/
     @GetMapping("/users2/{id}")
     public User retrieveUser2(@PathVariable int id) {
         User user = userService.findOne(id);
@@ -42,6 +45,20 @@ public class UserController {
             throw new UserNotFoundException("id - " + id);
         }
         return user;
+    }
+
+    /** With HETEOAS*/
+    @GetMapping("/users3/{id}")
+    public Resource<User> retrieveUser3(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        Resource resource = new Resource<User>(user);
+        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+        return resource;
     }
 
     // save  ==================================================
@@ -66,6 +83,17 @@ public class UserController {
      **/
     @PostMapping("/users3")
     public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    /**
+     * Add validation
+     **/
+    @PostMapping("/users4")
+    public ResponseEntity<Object> createUser4(@Valid @RequestBody User user) {
         User savedUser = userService.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedUser.getId()).toUri();

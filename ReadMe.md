@@ -1,69 +1,32 @@
-# Validation
+# HATEOAS
+**Hypermedia as the Engine of Application State**
 
-***UserController.java***
+*A client interacts with a REST API entirely through the responses provided dynamically by the server.*
+*Put even more simply: You shouldn't need any documentation or out-of-band information to use a REST API.*
+
+***pom.xml***
+```xml
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+```
+
+***UserController***
 ```java
-    @PostMapping("/users3")
-    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedUser.getId()).toUri();
-        return ResponseEntity.created(location).build();
+    @GetMapping("/users3/{id}")
+    public Resource<User> retrieveUser3(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        Resource resource = new Resource<User>(user);
+        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+        return resource;
     }
+
 ```
-
-***User.java***
-```java
-public class User {
-    private int id;
-
-    @Size(min = 2) // validate the size for 2 letters
-    private String name;
-
-    @Past // validate this should be a past date
-    private Date birthDate;
-}
-```
-
-***output :***
-12_validation.PNG
-status: 400 Bad request
-
-## custom validation
-
-***CustomizedResponseEntityExceptionHandler.java***
-```java
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
-//                ex.getBindingResult().toString());
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Validation Faild",
-                ex.getBindingResult().toString());
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
-    }
-```
-
-******
-```java
-    @PostMapping("/users3")
-    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedUser.getId()).toUri();
-        return ResponseEntity.created(location).build();
-    }
-```
-
-```java
-public class User {
-    private int id;
-
-    @Size(min = 2 , message = "Name should have at least 2 char") // validate the size for 2 letters
-    private String name;
-
-    @Past // validate this should be a past date
-    private Date birthDate;
-}
-```
+***output***
+13_HETEOAS.PNG
