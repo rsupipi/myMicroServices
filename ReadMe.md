@@ -1,32 +1,56 @@
-# HATEOAS
-**Hypermedia as the Engine of Application State**
+#  Internationalization
 
-*A client interacts with a REST API entirely through the responses provided dynamically by the server.*
-*Put even more simply: You shouldn't need any documentation or out-of-band information to use a REST API.*
+***create 2 property files***
 
-***pom.xml***
-```xml
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
-		</dependency>
+*message.properties*
+```properties
+good.morning.message=good Morming
+```
+*message_lk.properties*
+```properties
+good.morning.message=Ayubowan
 ```
 
-***UserController***
+- we can create class for each language. and add each propreties according to the language.
+
+***MyMicroServicesApplication.java***
 ```java
-    @GetMapping("/users3/{id}")
-    public Resource<User> retrieveUser3(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
-            throw new UserNotFoundException("id - " + id);
-        }
-        Resource resource = new Resource<User>(user);
-        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
-        resource.add(linkTo.withRel("all-users"));
-        return resource;
-    }
+@Bean
+	public LocaleResolver localeResolver(){
+		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+		localeResolver.setDefaultLocale(Locale.US);
+		return localeResolver;
+	}
 
+	@Bean
+	public ResourceBundleMessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("message");
+		return messageSource;
+	}
 ```
-***output***
-13_HETEOAS.PNG
+
+***HelloWordController.java***
+```java
+@RestController
+@ResponseBody
+public class HelloWordController {
+
+    @Autowired
+    private MessageSource messageSource;
+    
+    // Internalization =================================================
+        @GetMapping("/hello-internalization")
+        public String heollInternalization(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+          // return "good morning";
+             return messageSource.getMessage("good.morning.message", null, locale);
+        }
+                
+```
+
+***output:***
+the output will be displayed accorng to the language
+
+## Localecontext holder
+
+
