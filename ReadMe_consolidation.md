@@ -1,135 +1,346 @@
+# Note:
+Install JSON viewer chrome plugin for formatted JSON.
 
+[All notes in git hub](https://github.com/in28minutes/spring-microservices)
 
-# 5. Spring Cloud config server
-`03_Spring_config_server.png`
+[Standard Ports and  URLs:](https://github.com/in28minutes/spring-microservices/tree/master/03.microservices)
 
-Here we establish the connection with the springCloudServer and the git repository.
+# (1) Microservices
+	1.  REST
+	2. Cloud enables
+	3. small deploy-able units.
 
-* it store multiple configurations, in different services.
-[currencyCalculationService, CurrencyExchangeService, LimitServce]
+## chalenges
+	1. Bounded context -> identify the boundry
+	2. configuration management
+	3. Visibility [how do i know all are up and runing]
+	4. Pack of cards [fault tolerance]
 
-* it can store configuration in different environments
-[LimitService-> dev, QA, stage, Production]
+### Dynamic ScaleUp
+	* Euraka - Naming server
+	* Rebbon - client side load balancing
+	* Feign - Easier rest client
 
+## Visibility and monitoring
+	* Zipkin  - distributed service
+	* Netflix - API gateway
 
-# 4. Get configuration from application properties
+## Fault Tolerance
+	* Hystrix
 
-***1. application.properties***
+## Advantages
+	* new technology and process adaption.
+	* Dynamic scaling.
+	* Faster Release cycle
 
-add application name
-```properties
-spring.application.name=pipi-service
+# (2) Creating Spring Boot application
 
-limit-service.minimum=99
-limit-service.maximum=9999
-```
-***2. Configuration.java***
+## Create the project:
 
-get configuration from `application.properties`
-```java
-@Component /** @ConfigurationProperties is sufficient to register bean as a component**/
-@ConfigurationProperties("limit-service")
-@Getter @Setter  /** should be generate getters and setters**/
-public class Configuration {
-    private int maximum;
-    private int minimum;
+	1. got to  [https://start.spring.io/](https://start.spring.io/)
+	2. select -> maven -> java -> select version( getting snapshots are not commended)
+	3. select dependancies [Web, DevTool, Actuator, config client]
+`04_start_Spring_Application.PNG`
+`05_start_Spring_Application_dependancies.PNG`
 
-}
-
-```
-***3. LimitsConfigurationContorller.java***
-
-create a controller class
-```java
-@RestController
-public class LimitsConfigurationContorller {
-
-    @Autowired
-    private Configuration configuration;
-
-    @GetMapping("/limits")
-    public LimitConfiguration retriveLimitsFromConfigurations(){
-        return new LimitConfiguration(configuration.getMaximum(), configuration.getMinimum());
-    }
-
-}
-```
-
-***3. Run the project***
+## Run the project
 
 * run it via the IDE
 Run configuration -> + SpringBoot -> add `MyMicroServicesApplication` -> ok -> click run
 
-* using maven
-`mvn clean install`
-`mvn spring-boot:run`
 
-***URL***
-http://localhost:8080/limits
+# (3) Web Services
 
-***output***
+## SAOP vs REST
+
+	* Restriction vs Architectural style
+
+## 1. SOAP:
+
+	1. Use XML for request and response
+	2. Transport over the internet(HTTP) or MQ(Message Ques)
+	3.WSDL(Web service definition)
+
+		1. Endpoint
+		2. All operation
+		3. request structure
+		4. response structure
+`01_SOAP_request_structure.PNG`
+`02_SOAP_request.PNG`
+
+## 2. REST
+	1. HTTP Methods
+		1. GET
+		2. POST
+		3. PUT
+		4.  DELETE
+	2. Status code
+		1. 200
+	3. A resource has an URL(uniform resource identifier)
+	4. data exchange format -> XML, HTML, JSON
+	5. transport  -> only HTTP [rest is build on top of HTTP]
+	6. Service definition -> no standard. (WADL, swagger..)
+	7. REST is a style of software architecture for distributed hypermedia system
+
+Representation state transfer: `08_RESTful_webService.PNG`
+
+# (4) REST
+## 1. Annotations
+
+```java
+@RequestMapping(method = RequestMethod.GET, path = "hello")
+
+@GetMapping("hello")
+@PostMapping("user")
+@DeleteMapping("user/{id}")
+@PutMapping("user/{id}")
+``` 
+
+## 2. REST project
+
+***1. HelloWordController.java controller***
+```java
+@RestController
+public class HelloWordController {
+
+    //@RequestMapping(method = RequestMethod.GET, path = "hello")
+    @GetMapping("hello")    /** This is short and sweet**/
+    public String helloWorld(){
+        return "hello pipi";
+    }
+}
+```
+URL: http://localhost:8080/hello
+
+***output:***
+```json
+hi pipi
+```
+
+## 3. Returen bean
+
+```java
+    @GetMapping("hello-bean")
+    public Message helloBean(){
+        return new Message("hi pipi");
+    }
+```
+
+* getters and setters should be define of the bean.
+
+URL: http://localhost:8080/hello-bean
+
+***output:***
 ```json
 {
-    "maximum": 9999,
-    "minimum": 99
+    "myMessage": "hi pipi"
 }
 ```
 
-#  Internationalization
 
-***create 2 property files***
+## 4. Add `@PathVariable`
 
-*message.properties*
-```properties
-good.morning.message=good Morming
-```
-*message_lk.properties*
-```properties
-good.morning.message=Ayubowan
-```
-
-- we can create class for each language. and add each propreties according to the language.
-
-***MyMicroServicesApplication.java***
 ```java
-@Bean
-	public LocaleResolver localeResolver(){
-		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-		localeResolver.setDefaultLocale(Locale.US);
-		return localeResolver;
-	}
-
-	@Bean
-	public ResourceBundleMessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasename("message");
-		return messageSource;
-	}
+    @GetMapping("hello/user/{name}")
+    public Message helloPathVariable(@PathVariable String name){
+        return new Message(String.format("Hello %s", name));
+    }
 ```
 
-***HelloWordController.java***
-```java
-@RestController
-@ResponseBody
-public class HelloWordController {
+* getters and setters should be define of the bean.
 
-    @Autowired
-    private MessageSource messageSource;
-    
-    // Internalization =================================================
-        @GetMapping("/hello-internalization")
-        public String heollInternalization(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-          // return "good morning";
-             return messageSource.getMessage("good.morning.message", null, locale);
-        }
-                
+URL: http://localhost:8080/hello-bean
+
+***output:***
+```json
+{
+    "myMessage": "Hello RuchiraSupipi"
+}
 ```
 
 ***output:***
-the output will be displayed accorng to the language
+URL: http://localhost:8080/hello
+
+hello pipi
+
+## 5. HATEOAS
+**Hypermedia as the Engine of Application State**
+
+*A client interacts with a REST API entirely through the responses provided dynamically by the server.*
+*Put even more simply: You shouldn't need any documentation or out-of-band information to use a REST API.*
+
+***pom.xml***
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-hateoas</artifactId>
+</dependency>
+```
+
+***UserController***
+```java
+    @GetMapping("/users3/{id}")
+    public Resource<User> retrieveUser3(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        Resource resource = new Resource<User>(user);
+        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+        return resource;
+    }
+
+```
+***output***
+13_HETEOAS.PNG
 
 
-# 3. Creating a hardcoded service
+## 6. Validation
+
+***UserController.java***
+```java
+    @PostMapping("/users3")
+    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+```
+
+***User.java***
+```java
+public class User {
+    private int id;
+
+    @Size(min = 2) // validate the size for 2 letters
+    private String name;
+
+    @Past // validate this should be a past date
+    private Date birthDate;
+}
+```
+
+***request:***
+
+URL: `http://localhost:8080/users3`
+
+requst body:
+```json
+{
+    "id": 0,
+    "name": "R",
+    "birthDate": "1998-02-24T05:17:50.850+0000"
+}
+```
+
+***output :***
+
+12_validation.PNG
+
+status: 400 Bad request
+
+### custom validation
+
+***CustomizedResponseEntityExceptionHandler.java***
+```java
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatus status, WebRequest request) {
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+//                ex.getBindingResult().toString());
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Validation Faild",
+                ex.getBindingResult().toString());
+
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+```
+
+******
+```java
+    @PostMapping("/users3")
+    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedUser.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
+```
+
+```java
+public class User {
+    private int id;
+
+    @Size(min = 2 , message = "Name should have at least 2 char") // validate the size for 2 letters
+    private String name;
+
+    @Past // validate this should be a past date
+    private Date birthDate;
+}
+```
+
+
+## 7. Exception Handling
+
+### create custom class for handling 
+
+***Exception***
+```java
+/** Returning the Status code */
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+
+***Controller***
+```java
+    @GetMapping("/users2/{id}")
+    public User retrieveUser2(@PathVariable int id) {
+        User user = userService.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException("id - " + id);
+        }
+        return user;
+    }
+```
+
+`11_content_notFound.PNG`
+
+### Implementing Generic Exception Handling For All Resources
+
+```java
+@ControllerAdvice /* to be applicable across all controller */
+@RestController /** this is a kind of controller */
+public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+// handle all exception
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+// handle notFound exception
+    @ExceptionHandler(UserNotFoundException.class)
+    public final ResponseEntity<Object> handleNotFoundException(UserNotFoundException ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+}
+```
+output:
+11_genericExceptionHandler.PNG
+11_genericExceptionHandler_02.PNG
+
+# (5) Creating a hardcoded service
 
 ***1. application.properties***
 
@@ -153,11 +364,7 @@ public class LimitsConfigurationContorller {
 }
 ```
 
-***3. Run the project***
-
-* run it via the IDE
-Run configuration -> + SpringBoot -> add `MyMicroServicesApplication` -> ok -> click run
-
+***3. output:***
 * using maven
 `mvn clean install`
 `mvn spring-boot:run`
@@ -173,7 +380,7 @@ http://localhost:8080/limits
 }
 ```
 
-## Bean and Services
+# (6) Bean and Services
 
 ```java
 @RestController
@@ -290,315 +497,129 @@ Response:
 * with status code:
 10_PostCreateNewUser_statusCode.PNG
 
-# Exception Handling
+# (7) Internationalization
 
-## create custom class for handling 
+***create 2 property files***
 
-***Exception***
-```java
-/** Returning the Status code */
-@ResponseStatus(HttpStatus.NO_CONTENT)
-public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
-}
+*message.properties*
+```properties
+good.morning.message=good Morming
+```
+*message_lk.properties*
+```properties
+good.morning.message=Ayubowan
 ```
 
-***Controller***
+- we can create class for each language. and add each propreties according to the language.
+
+***MyMicroServicesApplication.java***
 ```java
-    @GetMapping("/users2/{id}")
-    public User retrieveUser2(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
-            throw new UserNotFoundException("id - " + id);
-        }
-        return user;
-    }
+@Bean
+	public LocaleResolver localeResolver(){
+		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+		localeResolver.setDefaultLocale(Locale.US);
+		return localeResolver;
+	}
+
+	@Bean
+	public ResourceBundleMessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("message");
+		return messageSource;
+	}
 ```
 
-`11_content_notFound.PNG`
-
-## Implementing Generic Exception Handling For All Resources
-
-```java
-@ControllerAdvice /* to be applicable across all controller */
-@RestController /** this is a kind of controller */
-public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-
-// handle all exception
-    @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-// handle notFound exception
-    @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<Object> handleNotFoundException(UserNotFoundException ex, WebRequest request){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
-    }
-}
-```
-
-# Validation
-
-***UserController.java***
-```java
-    @PostMapping("/users3")
-    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedUser.getId()).toUri();
-        return ResponseEntity.created(location).build();
-    }
-```
-
-***User.java***
-```java
-public class User {
-    private int id;
-
-    @Size(min = 2) // validate the size for 2 letters
-    private String name;
-
-    @Past // validate this should be a past date
-    private Date birthDate;
-}
-```
-
-***output :***
-12_validation.PNG
-status: 400 Bad request
-
-## custom validation
-
-***CustomizedResponseEntityExceptionHandler.java***
-```java
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
-//                ex.getBindingResult().toString());
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Validation Faild",
-                ex.getBindingResult().toString());
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
-    }
-```
-
-******
-```java
-    @PostMapping("/users3")
-    public ResponseEntity<Object> createUser3(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedUser.getId()).toUri();
-        return ResponseEntity.created(location).build();
-    }
-```
-
-```java
-public class User {
-    private int id;
-
-    @Size(min = 2 , message = "Name should have at least 2 char") // validate the size for 2 letters
-    private String name;
-
-    @Past // validate this should be a past date
-    private Date birthDate;
-}
-```
-
-# HATEOAS
-**Hypermedia as the Engine of Application State**
-
-*A client interacts with a REST API entirely through the responses provided dynamically by the server.*
-*Put even more simply: You shouldn't need any documentation or out-of-band information to use a REST API.*
-
-***pom.xml***
-```xml
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
-		</dependency>
-```
-
-***UserController***
-```java
-    @GetMapping("/users3/{id}")
-    public Resource<User> retrieveUser3(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
-            throw new UserNotFoundException("id - " + id);
-        }
-        Resource resource = new Resource<User>(user);
-        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
-        resource.add(linkTo.withRel("all-users"));
-        return resource;
-    }
-
-```
-***output***
-13_HETEOAS.PNG
-
-# 2. Creating Spring Boot application
-
-	1. got to  [https://start.spring.io/](https://start.spring.io/)
-	2. select -> maven -> java -> select version( getting snapshots are not commended)
-	3. select dependancies [Web, DevTool, Actuator, config client]
-`04_start_Spring_Application.PNG`
-`05_start_Spring_Application_dependancies.PNG`
-
-# 1. Web Services
-
-## SAOP vs REST
-
-	* Restriction vs Architectural style
-
-## 1. SOAP:
-
-	1. Use XML for request and response
-	2. Transport over the internet(HTTP) or MQ(Message Ques)
-	3.WSDL(Web service definition)
-
-		1. Endpoint
-		2. All operation
-		3. request structure
-		4. response structure
-`01_SOAP_request_structure.PNG`
-`02_SOAP_request.PNG`
-
-## 2. REST
-	1. HTTP Methods
-		1. GET
-		2. POST
-		3. PUT
-		4.  DELETE
-	2. Status code
-		1. 200
-	3. A resource has an URL(uniform resource identifier)
-	4. data exchange format -> XML, HTML, JSON
-	5. transport  -> only HTTP [rest is build on top of HTTP]
-	6. Service definition -> no standard. (WADL, swagger..)
-	7. REST is a style of software architecture for distributed hypermedia system
-
-Representation state transfer: `08_RESTful_webService.PNG`
-
-## Annotations
-
-```java
-@RequestMapping(method = RequestMethod.GET, path = "hello")
-
-@GetMapping("hello")
-@PostMapping("user")
-@DeleteMapping("user/{id}")
-@PutMapping("user/{id}")
-``` 
-
-## REST project
-
-***1. HelloWordController.java controller***
+***HelloWordController.java***
 ```java
 @RestController
+@ResponseBody
 public class HelloWordController {
 
-    //@RequestMapping(method = RequestMethod.GET, path = "hello")
-    @GetMapping("hello")    /** This is short and sweet**/
-    public String helloWorld(){
-        return "hello pipi";
+    @Autowired
+    private MessageSource messageSource;
+    
+    // Internalization =================================================
+        @GetMapping("/hello-internalization")
+        public String heollInternalization(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+          // return "good morning";
+             return messageSource.getMessage("good.morning.message", null, locale);
+        }
+                
+```
+
+***output:***
+the output will be displayed accorng to the language
+
+# (8) Get configuration from application properties
+
+***1. application.properties***
+
+add application name
+```properties
+spring.application.name=pipi-service
+
+limit-service.minimum=99
+limit-service.maximum=9999
+```
+***2. Configuration.java***
+
+get configuration from `application.properties`
+```java
+@Component /** @ConfigurationProperties is sufficient to register bean as a component**/
+@ConfigurationProperties("limit-service")
+@Getter @Setter  /** should be generate getters and setters**/
+public class Configuration {
+    private int maximum;
+    private int minimum;
+
+}
+
+```
+***3. LimitsConfigurationContorller.java***
+
+create a controller class
+```java
+@RestController
+public class LimitsConfigurationContorller {
+
+    @Autowired
+    private Configuration configuration;
+
+    @GetMapping("/limits")
+    public LimitConfiguration retriveLimitsFromConfigurations(){
+        return new LimitConfiguration(configuration.getMaximum(), configuration.getMinimum());
     }
+
 }
 ```
-URL: http://localhost:8080/hello
 
-***output:***
-```json
-hi pipi
-```
+***3. Run the project***
 
-## Returen bean
+* run it via the IDE
+Run configuration -> + SpringBoot -> add `MyMicroServicesApplication` -> ok -> click run
 
-```java
-    @GetMapping("hello-bean")
-    public Message helloBean(){
-        return new Message("hi pipi");
-    }
-```
+* using maven
+`mvn clean install`
+`mvn spring-boot:run`
 
-* getters and setters should be define of the bean.
+***URL***
+http://localhost:8080/limits
 
-URL: http://localhost:8080/hello-bean
-
-***output:***
+***output***
 ```json
 {
-    "myMessage": "hi pipi"
+    "maximum": 9999,
+    "minimum": 99
 }
 ```
 
+# (9) Spring Cloud config server
+`03_Spring_config_server.png`
 
-## Add path variables
+Here we establish the connection with the springCloudServer and the git repository.
 
-```java
-    @GetMapping("hello/user/{name}")
-    public Message helloPathVariable(@PathVariable String name){
-        return new Message(String.format("Hello %s", name));
-    }
-```
+* it store multiple configurations, in different services.
+[currencyCalculationService, CurrencyExchangeService, LimitServce]
 
-* getters and setters should be define of the bean.
-
-URL: http://localhost:8080/hello-bean
-
-***output:***
-```json
-{
-    "myMessage": "Hello RuchiraSupipi"
-}
-```
-
-***output:***
-URL: http://localhost:8080/hello
-
-hello pipi
-
-# Microservices
-	1.  REST
-	2. Cloud enables
-	3. small deploy-able units.
-
-## chalenges
-	1. Bounded context -> identify the boundry
-	2. configuration management
-	3. Visibility [how do i know all are up and runing]
-	4. Pack of cards [fault tolerance]
-
-### Dynamic ScaleUp
-	* Euraka - Naming server
-	* Rebbon - client side load balancing
-	* Feign - Easier rest client
-
-## Visibility and monitoring
-	* Zipkin  - distributed service
-	* Netflix - API gateway
-
-## Fault Tolerance
-	* Hystrix
-
-## Advantages
-	* new technology and process adaption.
-	* Dynamic scaling.
-	* Faster Release cycle
-
-# Note:
-Install JSON viewer chrome plugin for formatted JSON.
-
-[All notes in git hub](https://github.com/in28minutes/spring-microservices)
-
-[Standard Ports and  URLs:](https://github.com/in28minutes/spring-microservices/tree/master/03.microservices)
+* it can store configuration in different environments
+[LimitService-> dev, QA, stage, Production]
