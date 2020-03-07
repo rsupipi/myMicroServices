@@ -36,13 +36,18 @@ public class HelloWordController {
 
 
     // Internalization =================================================
+
+
+
     @GetMapping("/hello-internalization1")
     public String heollInternalization1(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
 //        return "good morning";
          return messageSource.getMessage("good.morning.message", null, locale);
     }
 
-    /* */
+    /** According to this we have to add locale in every request. Since it is is painful to use, we can use
+     * LocalContextHolder instead of this.
+     * */
     @GetMapping("/hello-internalization2")
     public String heollInternalization() {
         return messageSource.getMessage("good.morning.message", null, LocaleContextHolder.getLocale());

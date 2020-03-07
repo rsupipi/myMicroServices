@@ -53,4 +53,46 @@ the output will be displayed accorng to the language
 
 ## Localecontext holder
 
+Advantage of this is, we do not need send in request parameter.
+
+***HelloWordController.java***
+```java
+/** According to this we have to add locale in every request. Since it is is painful to use, we can use
+     * LocalContextHolder instead of this.
+     * */
+    @GetMapping("/hello-internalization2")
+    public String heollInternalization() {
+        return messageSource.getMessage("good.morning.message", null, LocaleContextHolder.getLocale());
+    }
+```
+
+***MyMicroServicesApplication.java***
+```java
+	/** locale with Locale Resolver*/
+	@Bean
+	public LocaleResolver localeResolver(){
+//		SessionLocaleResolver localeResolver = new SessionLocaleResolver(); // remove
+		AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver(); // add
+		localeResolver.setDefaultLocale(Locale.US);
+		return localeResolver;
+	}
+
+//	We can remove this and move the configuration to application.properties.
+//	@Bean
+//	public ResourceBundleMessageSource messageSource() {
+//		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+//		messageSource.setBasename("message");
+//		return messageSource;
+//	}
+```
+
+***application.properties***
+```properties
+spring.messages.basename=message
+```
+
+***output***
+
+15_Internalization_AccepetHeader_default.PNG
+16_Internalization_AccepetHeader_lk.PNG
 
