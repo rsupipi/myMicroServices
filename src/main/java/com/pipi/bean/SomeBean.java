@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 /** This is not a good approach since we are hardcoding values */
-//@JsonIgnoreProperties(value = {"name"})
+@JsonIgnoreProperties(value = {"name"})
 public class SomeBean {
     private String id;
     private String name;
