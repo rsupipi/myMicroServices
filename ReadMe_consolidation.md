@@ -548,6 +548,8 @@ public class HelloWordController {
 ```
 
 ***output:***
+*`Accept-Language` is the parameter. we pass here*
+
 the output will be displayed accorng to the language
 14_Internalization_lk.PNG
 

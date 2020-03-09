@@ -68,7 +68,7 @@ public class UserController {
     }
 
     /**
-     * returning status code and Location URI
+     * returning status code and Location URI for getting created user
      **/
     @PostMapping("/users2")
     public ResponseEntity<Object> createUser2(@RequestBody User user) {

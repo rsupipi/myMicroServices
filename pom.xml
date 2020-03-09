@@ -59,12 +59,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.12</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Link the XML conversion -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<!-- <version>1.18.12</version>-->
+			<!-- We don't need to specify the version, the Spring dependency management handles that.-->
 		</dependency>
 
 	</dependencies>
