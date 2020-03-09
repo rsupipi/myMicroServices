@@ -1,49 +1,54 @@
-# Monitoring APIs with SpringBoot actuator.
+# Filtering For RESTful Service
 
-```xml
+## 1. Static Filtering
 
-		<!-- actuator monitor services-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<!-- Actuator is providing lot of monitoring facilities-->
+If we want to skip some attribute in the bean we use filtering.
 
-		<!--Hal browser-->
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-rest-hal-browser</artifactId>
-		</dependency>
-		<!-- Hypertext Application Language - is a specific format that gives a consitent and easy way to hyperlink
-		 between resources in your API. 'starter-actuators' are in the HAL format.
-		 * what Hal browsers does is it look at it's API, identify links and show them on the screen.
-		  -->
+eg: we should remove the password field from the response.
+
+## ignore in property level.
+***
+```java
+public class SomeBean {
+    private String id;
+    private String name;
+
+    @JsonIgnore // since this is a password we shouldn't send this with the response.
+    private String password;
+
+    // getters and setters
+    
+}
+```
+***Before ignore:***    28_Without_filtering.PNG
+```json
+{
+    "id": "C001",
+    "name": "Sama",
+    "password": "sama@123"
+}
+```
+***After ignore:***     29_With_filtering.PNG
+```json
+{
+    "id": "C001",
+    "name": "Sama"
+}
 ```
 
-## Actuator URL
-it has changed according to the Spring version.
-
-- http://localhost:8080/actuator : (after 2.0 release latest)
-or
-- http://localhost:8080/application
-or
-http://localhost:8080
-
-* this will open hal browser if you have the hal dependency.
-http://localhost:8080 or http://localhost:8080/browser/index.html
-* But it gave me an error. Still I don't know. :(
+## Bean level filtering
+```java
+/** This is not a good approach since we are hardcoding values */
+@JsonIgnoreProperties(value = {"name"})
+public class SomeBean {
+    private String id;
+    private String name;
+}
+```
 
 output:
-25_actuator_links.json
-26_actuator_links_health.json
-
-## actuator with full feature
-
-`application.properties`
-```properties
-# === add more features to actuator ==========
-management.endpoints.web.exposure.include=*
+```json
+{
+    "id": "C001"
+}
 ```
-
-***output***
-27_actuator_links_fulFeature.json
