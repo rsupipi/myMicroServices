@@ -16,6 +16,7 @@ import java.util.Set;
 @EnableSwagger2 // enable swagger
 public class SwaggerConfig {
 
+    /** tutorial's note
 //    public static final Contact DEFAULT_CONTACT = new Contact(
 //            "Ranga Karanam", "http://www.in28minutes.com", "in28minutes@gmail.com");
 //
@@ -27,6 +28,7 @@ public class SwaggerConfig {
 //    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES =
 //            new HashSet<String>(Arrays.asList("application/json",
 //                    "application/xml"));
+*/
 
     public static final Contact DEFAULT_CONTACT = new Contact("testName", "testURL", "testEmail");
     public static final ApiInfo DEFAULT_API_INFO = new ApiInfo("testTitle", "testDescription",
@@ -40,6 +42,9 @@ public class SwaggerConfig {
     // bean -docket
     @Bean
     public Docket api() {
+
+//        return new Docket(DocumentationType.SWAGGER_2);
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(DEFAULT_API_INFO)
                 .produces(DEFAULT_PRODUCES_AND_CONSUMES)
