@@ -627,6 +627,51 @@ spring.messages.basename=message
 
 21_ContentNegotiation_xml_yes_POST.PNG
 
+# (9) Swagger
+
+Swagger is the documentation, for restful services.
+
+***Add dependencies.***
+- x-swagger2
+- springfox-swagger-ui
+
+```xml
+        <!-- swagger -->
+
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+```
+
+***API docs:*** http://localhost:8080/v2/api-docs
+
+***Swagger ui:***http://localhost:8080/swagger-ui.html
+
+## Details in api-docs
+22_swagger-api-dcs.PNG, 
+23_swagger_api-docs.json
+
+```json
+swagger: <swagger version>
+info: <information about documentation>
+basePath: <base path for services>
+host: <running host>
+tags: < resource (controllers)>
+paths: <path for services>
+definiction: <what are the elements in >
+
+```
+
 # (8) Get configuration from application properties
 
 ***1. application.properties***
