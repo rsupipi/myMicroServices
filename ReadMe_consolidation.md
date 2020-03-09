@@ -656,6 +656,34 @@ Swagger is the documentation, for restful services.
 		</dependency>
 ```
 
+***SwaggerConfig.java***
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration  //Configuration
+@EnableSwagger2 // enable swagger
+public class SwaggerConfig {
+
+    // bean -docket
+    @Bean
+    public Docket api(){
+        return new Docket(DocumentationType.SWAGGER_2);
+    }
+
+    //Swagger 2
+
+    //All the paths
+
+    // All the api
+
+}
+```
+
 ***API docs:*** http://localhost:8080/v2/api-docs
 
 ***Swagger ui:***http://localhost:8080/swagger-ui.html
@@ -719,6 +747,29 @@ private Date birthDate;
 ```
 
 * for more annotations go to: 24_swagger-annotations.PNG
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # (8) Get configuration from application properties
 
