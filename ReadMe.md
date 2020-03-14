@@ -1,132 +1,56 @@
-# Filtering For RESTful Service
+# versioining
 
-## 1. Static Filtering
+32_versioning.PNG
 
-If we want to skip some attribute in the bean we use filtering.
+- 1st we need to save the name as in PersonV1.java
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PersonV1 {
+    private String name;
+}
+```
 
-eg: we should remove the password field from the response.
+- But in later, we decided to have both first name and last name.
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PersonV2 {
+    private Name name;
+}
+```
 
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Name {
+    private String firstName;
+    private String lastName;
+}
+
+```
+
+- but the old consumers are expecting that as old way. So we have to create two methods for expose the services.
 ```java
 @RestController
-public class FilteringContorller {
-    @GetMapping("/filtering")
-    public SomeBean retriveSomeBean1() {
-        return new SomeBean("C001", "Sama", "sama@123");
+public class PersonVersioningController {
+
+    @GetMapping("v1/person")
+    public PersonV1 personV1(){
+        return new PersonV1("Ruchira Supipi");
     }
 
-    @GetMapping("/filtering-list")
-    public List<SomeBean> retriveSomeBeanList1() {
-        return Arrays.asList(
-                new SomeBean("C001", "Sama", "sama@123"),
-                new SomeBean("C002", "Mala", "mala@123"));
+    @GetMapping("v2/person")
+    public PersonV2 personV2(){
+        return new PersonV2(new Name("Ruchira", "Supipi"));
     }
 }
 ```
 
-## ignore in property level.
-***
-```java
-public class SomeBean {
-    private String id;
-    private String name;
+otput:
+33_versioning_V1.PNG
+34_versioning_V2.PNG
 
-    @JsonIgnore // since this is a password we shouldn't send this with the response.
-    private String password;
-
-    // getters and setters
-    
-}
-```
-***Before ignore:***    28_Without_filtering.PNG
-```json
-{
-    "id": "C001",
-    "name": "Sama",
-    "password": "sama@123"
-}
-```
-***After ignore:***     29_With_filtering.PNG
-```json
-{
-    "id": "C001",
-    "name": "Sama"
-}
-```
-
-## Bean level filtering
-```java
-/** This is not a good approach since we are hardcoding values */
-@JsonIgnoreProperties(value = {"name"})
-public class SomeBean {
-    private String id;
-    private String name;
-}
-```
-
-output:
-```json
-{
-    "id": "C001"
-}
-```
-
-
-## 2. Dynamic Filtering
-
-***Controller.class***
-```java
-@RestController
-public class FilteringContorller {
-/** Filter the response according to the method*/
-
- // send only id , name
-    @GetMapping("/filtering2")
-    public MappingJacksonValue retriveSomeBean2() {
-        SomeBean2 someBean2 = new SomeBean2("C001", "Sama", "sama@123");
-
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name");
-        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("SomeBeanFilter", filter);
-
-        MappingJacksonValue mappingValue = new MappingJacksonValue(someBean2);
-        mappingValue.setFilters(filterProvider);
-
-        return mappingValue;
-    }
-
-    // send only name, password
-    @GetMapping("/filtering-list2")
-    public MappingJacksonValue retriveSomeBeanList2() {
-
-        List<SomeBean2> someBeanList = Arrays.asList(
-                new SomeBean2("C001", "Sama", "sama@123"),
-                new SomeBean2("C002", "Mala", "mala@123"));
-
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("name", "password");
-        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("SomeBeanFilter", filter);
-
-        MappingJacksonValue mappingValue = new MappingJacksonValue(someBeanList);
-        mappingValue.setFilters(filterProvider);
-
-        return mappingValue;
-    }
-
-}
-```
-
-***bean class***
-```java
-@JsonFilter("SomeBeanFilter")// add filter to the bean.
-public class SomeBean2 {
-    private String id;
-    private String name;
-    private String password;
-
-}
-```
-
-***output***
-30_filtering_dynamic.PNG
-31_filtering_dynamic.PNG
-
-Step 26 - Versioning RESTful Services - Basic Approach with URIs
-VIDEO

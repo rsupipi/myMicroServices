@@ -288,9 +288,9 @@ public class User {
 
 ## 7. Exception Handling
 
-### create custom class for handling 
+### create custom class for handling Exceptions
 
-***Exception***
+***UserNotFoundException***
 ```java
 /** Returning the Status code */
 @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -604,11 +604,6 @@ spring.messages.basename=message
 # (8) content Negotiation
 
 - In Spring the default format is JSON.
-
-15_Internalization_AccepetHeader_default.PNG
-
-16_Internalization_AccepetHeader_lk.PNG
-
 - **Jackscon** - does the binding of the object to json and json to object.
 - If we need to get xml we need to add xml dependency.
 
@@ -686,7 +681,7 @@ public class SwaggerConfig {
 
 ***API docs:*** http://localhost:8080/v2/api-docs
 
-***Swagger ui:***http://localhost:8080/swagger-ui.html
+***Swagger ui:*** http://localhost:8080/swagger-ui.html
 
 ## Details in api-docs
 22_swagger-api-dcs.PNG, 
@@ -700,7 +695,6 @@ host: <running host>
 tags: < resource (controllers)>
 paths: <path for services>
 definiction: <what are the elements in >
-
 ```
 
 ## Customized api-doc
