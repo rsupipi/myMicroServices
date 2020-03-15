@@ -15,4 +15,34 @@ public class PersonVersioningController {
     public PersonV2 personV2(){
         return new PersonV2(new Name("Ruchira", "Supipi"));
     }
+
+    @GetMapping(value = "person/param", params = "version=1")
+    public PersonV1 personParamV1(){
+        return new PersonV1("Ruchira Supipi");
+    }
+
+    @GetMapping(value = "person/param", params = "version=2")
+    public PersonV2 personParamV2(){
+        return new PersonV2(new Name("Ruchira", "Supipi"));
+    }
+
+    @GetMapping(value = "person/headers", headers = "version=1")
+    public PersonV1 personHeaderV1(){
+        return new PersonV1("Ruchira Supipi");
+    }
+
+    @GetMapping(value = "person/headers", headers = "version=2")
+    public PersonV2 personHeaderV2(){
+        return new PersonV2(new Name("Ruchira", "Supipi"));
+    }
+
+    @GetMapping(value = "person/produces", produces = "application/pipi.company.app-v1+json")
+    public PersonV1 personProducesV1(){
+        return new PersonV1("Ruchira Supipi");
+    }
+
+    @GetMapping(value = "person/produces", produces = "application/pipi.company.app-v2+json")
+    public PersonV2 personProducesV2(){
+        return new PersonV2(new Name("Ruchira", "Supipi"));
+    }
 }
