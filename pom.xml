@@ -101,6 +101,12 @@
 		 * what Hal browsers does is it look at it's API, identify links and show them on the screen.
 		  -->
 
+		<!-- spring security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
