@@ -1,4 +1,4 @@
-package com.pipi.bean;
+package com.pipi.filtering;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

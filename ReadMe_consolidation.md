@@ -1,4 +1,5 @@
 # Note:
+* resolve dependencies as in pomPrevious.xml
 
 - [Url for the tutorial](https://www.learningcrux.com/course/master-microservices-with-spring-boot-and-spring-cloud)
 
@@ -18,7 +19,7 @@
 	2. configuration management
 	3. Visibility [how do i know all are up and runing]
 	4. Pack of cards [fault tolerance]
-
+ private String firstName;
 ### Dynamic ScaleUp
 	* Euraka - Naming server
 	* Rebbon - client side load balancing
@@ -937,14 +938,6 @@ public class PersonV1 {
 ```
 
 - But in later, we decided to have both first name and last name.
-```java
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PersonV2 {
-    private Name name;
-}
-```
 
 ```java
 @Data
@@ -1081,8 +1074,6 @@ send user id & password.
 
 2. digest authentication.
 password digest is created and the digest is send across. the actual is not send
-
-3. 
 
 ## 1. Basic authentication.
 
