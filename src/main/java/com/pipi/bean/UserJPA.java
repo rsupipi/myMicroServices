@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This call contain jpa configurations
@@ -30,5 +32,11 @@ public class UserJPA {
 
     private Date birthDate;
 
+//      name of the POSTJPA column (line 36 in OPST.java)
+    @OneToMany(mappedBy = "user")
+    private List<PostJPA> postJPAS;
+
     /**generate setters and getters*/
+
+    /** toString */
 }
